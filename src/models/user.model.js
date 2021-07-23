@@ -6,11 +6,28 @@ const { roles } = require('../config/roles');
 
 const userSchema = mongoose.Schema(
   {
-    name: {
+    _id: mongoose.Schema.Types.ObjectId,
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+      lowercase: true,
+    },
+    first_name: {
       type: String,
       required: true,
       trim: true,
     },
+    last_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    instagram_url: {
+      type: String
+    },
+    dob: Date,
     email: {
       type: String,
       required: true,
@@ -23,30 +40,52 @@ const userSchema = mongoose.Schema(
         }
       },
     },
-    password: {
+    mobile: {
       type: String,
+      minlength: 10,
       required: true,
+    },
+    profile_photo: String,
+    login_type: Number,
+    gmail: {
+      type: String,
       trim: true,
-      minlength: 8,
       validate(value) {
-        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-          throw new Error('Password must contain at least one letter and one number');
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email');
         }
       },
-      private: true, // used by the toJSON plugin
     },
-    role: {
-      type: String,
-      enum: roles,
-      default: 'user',
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
+    google_access_token: String,
+    google_id: String,
+    google_id_token: String,
+    device_id: [String],
+    favorite_lists: [{
+      _id: mongoose.Schema.Types.ObjectId,
+      name: {
+        type: String,
+        trim: true
+      },
+      maps: [String],
+      created_date: {
+        type: Date,
+        default: Date.now
+      }
+    }],
+    follower_count: Number,
+    following_count: Number,
+    followers: [{
+      _id: false,
+      user_id: mongoose.Schema.Types.ObjectId,
+      name: String
+    }],
+    following: [{
+      _id: false,
+      user_id: mongoose.Schema.Types.ObjectId,
+      name: String
+    }],
+    maps_created: Date,
+    created_date: Date,
   }
 );
 
@@ -70,22 +109,25 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  * @param {string} password
  * @returns {Promise<boolean>}
  */
-userSchema.methods.isPasswordMatch = async function (password) {
+/*userSchema.methods.isPasswordMatch = async function (password) {
   const user = this;
   return bcrypt.compare(password, user.password);
-};
+};*/
 
-userSchema.pre('save', async function (next) {
+/*userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
   }
   next();
-});
+});*/
 
 /**
  * @typedef User
  */
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('users', userSchema);
+
+mongoose.set('useFindAndModify', false);
+mongoose.set('debug', true);
 
 module.exports = User;

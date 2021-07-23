@@ -34,10 +34,30 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const createList = catchAsync(async (req, res) => {
+  const list = await userService.createList(req.body.userId, req.body);
+  if(!list) {
+    res.send({'code': 200, 'message': 'List already exist', 'data': false});
+  } else {
+    res.send({'code': httpStatus.CREATED, 'message': 'List Created', 'data': true});
+  }
+});
+
+const addMapToList = catchAsync(async (req, res) => {
+  const list = await userService.addMapToList(req.body.userId, req.body.mapId, req.body.listId);
+  if(!list) {
+    res.send({'code': 200, 'message': 'Map already exist to you list', 'data': false});
+  } else {
+    res.send({'code': httpStatus.CREATED, 'message': 'Map added to list', 'data': true});
+  }
+});
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  createList,
+  addMapToList,
 };

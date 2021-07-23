@@ -80,6 +80,29 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const createList = async (userId, listBody) => {
+  let objid = require('mongoose').Types.ObjectId();
+  listBody._id =  objid;
+  console.log(listBody);
+  const insertList = await User.updateOne({_id: userId, 'favorite_lists.name': {$ne: listBody.name}}, {$push: {favorite_lists: listBody}});
+  if(insertList.nModified) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const addMapToList = async (userId, mapId, listId) => {
+  const insertList = await User.findOne({_id: userId, 'favorite_lists._id': listId});
+  console.log(insertList.favorite_lists);
+  insertList.favorite_lists.maps.push(mapId);
+  if(insertList) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 module.exports = {
   createUser,
   queryUsers,
@@ -87,4 +110,6 @@ module.exports = {
   getUserByEmail,
   updateUserById,
   deleteUserById,
+  createList,
+  addMapToList,
 };

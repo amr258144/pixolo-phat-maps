@@ -17,6 +17,9 @@ router
   .patch(auth('manageUsers'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('manageUsers'), validate(userValidation.deleteUser), userController.deleteUser);
 
+router.post('/list', userController.createList);
+router.patch('/list/add-map', userController.addMapToList);
+
 module.exports = router;
 
 /**
