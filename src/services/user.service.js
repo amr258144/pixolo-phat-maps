@@ -93,10 +93,8 @@ const createList = async (userId, listBody) => {
 };
 
 const addMapToList = async (userId, mapId, listId) => {
-  const insertList = await User.findOne({_id: userId, 'favorite_lists._id': listId});
-  console.log(insertList.favorite_lists);
-  insertList.favorite_lists.maps.push(mapId);
-  if(insertList) {
+  const insertList = await User.update({_id: userId, 'favorite_lists._id': listId}, {$addToSet: {'favorite_lists.$.maps': {$each: [mapId]}}});
+  if(insertList.nModified) {
     return true;
   } else {
     return false;
